@@ -155,22 +155,22 @@ If you want to evaluate the performance of CSD-R*k*NN against other algorithms (
 >>> plot_single_distribution(time_cost)
 >>> plot_single_distribution(io_cost)
 
->>> # effect RkNN queries for restaurant
+>>> # evaluate RkNN queries for restaurant
 >>> time_cost, io_cost = experiments.CaseStudyExperiments.evaluate_RkNN_for_restaurant()
 >>> plot_single_distribution(time_cost)
 >>> plot_single_distribution(io_cost)
 
->>> # effect RkNN queries for mall
+>>> # evaluate RkNN queries for mall
 >>> time_cost, io_cost = experiments.CaseStudyExperiments.evaluate_RkNN_for_mall()
 >>> plot_single_distribution(time_cost)
 >>> plot_single_distribution(io_cost)
 
->>> # effect RkNN queries for hospital
+>>> # evaluate RkNN queries for hospital
 >>> time_cost, io_cost = experiments.CaseStudyExperiments.evaluate_RkNN_for_hospital()
 >>> plot_single_distribution(time_cost)
 >>> plot_single_distribution(io_cost)
 
->>> # effect RkNN queries for school
+>>> # evaluate RkNN queries for school
 >>> time_cost, io_cost = experiments.CaseStudyExperiments.evaluate_RkNN_for_school()
 >>> plot_single_distribution(time_cost)
 >>> plot_single_distribution(io_cost)
