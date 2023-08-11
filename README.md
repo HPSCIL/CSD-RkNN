@@ -1,18 +1,10 @@
-# CSD-R*k*NN: Conic Section Discriminances for Large Scale Reverse *k* Nearest Neighbors Queries
-## Overview
-The neighborhood relationships between spatial objects can help to understand their essential features, most geographic information systems (GIS) and location based services (LBS) therefore provide two types of spatial queries for nearest neighbor analysis: ***k* nearest neighbors** (***k*NN**) query and **reverse *k* nearest neighbors** (**R*****k*NN**) query.
-The aim of *k*NN queries is to find the *k* points closest to the query point, while for R*k*NN queries, all the points that consider the query point as one of their *k* closest points are required to be found.
-For some nearest neighbor analyses in geospatial applications, *k*NN queries are practical and easy to implement.
-However, when faced with some special scenarios, such as facility location, influential domain analysis and potential customer analysis, the query of R*k*NN is more suitable.
-The existing R*k*NN search algorithms can generally return correct results in a relatively short time (a few seconds) when faced with small-scale (which means the value of *k* is relatively small) query tasks.
-Unfortunately, once the value of *k* becomes relatively large, e.g., *k* is 1000 or greater, they can no longer respond in a tolerable time.
-Accordingly, the main goal of this work is to improve the performance of R*k*NN algorithms in the face of large-scale query tasks.
-According to the characteristics of conic sections, we propose a verification approach, named Conic Section Discriminance (CSD), to determine whether points belong to the R*k*NN set.
-With CSD, only a small fraction of candidates need to be verified by costly *k*NN queries, while the verification cost of the vast majority of candidates is only *O*(1).
-Furthermore, we propose a Voronoi based candidate generation approach to reduce the candidate set.
-Based on VoR-tree, we combined two proposed approaches to form a novel R*k*NN algorithm, termed **CSD-R*****k*NN**.
-A series of experiments were conducted to compare CSD-R*k*NN with **SLICE**, the state-of-the-art R*k*NN algorithm, and **VR-R*****k*NN**, the original R*k*NN algorithm on VoR-tree.
-The experimental results indicate that CSD-R*k*NN significantly outperforms the other two algorithms, especially when the value of *k* is relatively large.
+# CSD-R*k*NN
+CSD-R*k*NN is a high-performance reverse *k* nearest neighbors (R*k*NN) query algorithm, leveraging the concept of conic section discriminance (CSD) for its efficient implementation.
+If you have any questions, please don't hesitate to reach out by email to the authors.
+Subsequent updates will be disseminated through the project's GitHub repository.
+
+- **GitHub source code:**  https://github.com/HPSCIL/CSD-RkNN
+- **Email:**  liyang_cs@cug.edu.cn
 ## Project structure
 ```
 CSD-RkNN/:
@@ -103,18 +95,43 @@ Plot the result:
 >>> plt.show()
 ```
 ![](images/usage_example.png)
-
 ## Evaluation
 If you want to evaluate the performance of CSD-R*k*NN against other algorithms (e.g., SLICE and VR-R*k*NN), you can run the following codes.
 ```python
 >>> # effect of data size on Mono-RkNN
->>> time_cost, io_cost = experiments.BenchmarkExperiments.evaluate_effect_of_data_size_on_MonoRkNN(10)
->>> plot_dual_distribution(time_cost)
->>> plot_dual_distribution(io_cost)
->>> time_cost, io_cost = experiments.BenchmarkExperiments.evaluate_effect_of_data_size_on_MonoRkNN(1000)
->>> plot_dual_distribution(time_cost)
->>> plot_dual_distribution(io_cost)
->>> 
+>>> time_cost, io_cost = experiments.BenchmarkExperiments.evaluate_effect_of_data_size_on_MonoRkNN(k=10, 
+                                                                                                   distribution='Synthetic')
+>>> plot_dual_distribution(time_cost, 'Effect-of-data-size-on-MonoRkNN-time-cost(k=10,Synthetic)')
+>>> plot_dual_distribution(io_cost, 'Effect-of-data-size-on-MonoRkNN-io-cost(k=10,Synthetic)')
+>>> time_cost, io_cost = experiments.BenchmarkExperiments.evaluate_effect_of_data_size_on_MonoRkNN(k=10,
+                                                                                                   distribution='Real')
+>>> plot_single_distribution(time_cost, 'Effect-of-data-size-on-MonoRkNN-time-cost(k=10,Real)')
+>>> plot_single_distribution(io_cost, 'Effect-of-data-size-on-MonoRkNN-io-cost(k=10,Real)')
+>>> time_cost, io_cost = experiments.BenchmarkExperiments.evaluate_effect_of_data_size_on_MonoRkNN(k=1000,
+                                                                                                   distribution='Synthetic')
+>>> plot_dual_distribution(time_cost, 'Effect-of-data-size-on-MonoRkNN-time-cost(k=1000,Synthetic)')
+>>> plot_dual_distribution(io_cost, 'Effect-of-data-size-on-MonoRkNN-io-cost(k=1000,Synthetic)')
+>>> time_cost, io_cost = experiments.BenchmarkExperiments.evaluate_effect_of_data_size_on_MonoRkNN(k=1000,
+                                                                                                   distribution='Real')
+>>> plot_single_distribution(time_cost, 'Effect-of-data-size-on-MonoRkNN-time-cost(k=1000,Real)')
+>>> plot_single_distribution(io_cost, 'Effect-of-data-size-on-MonoRkNN-io-cost(k=1000,Real)')
+```
+<table>
+  <tr>
+    <td align="center"><img src="images/Effect-of-data-size-on-MonoRkNN-time-cost(k=10,Synthetic).png" width="200px"><br>Time (Synthetic,k=10)</td>
+    <td align="center"><img src="images/Effect-of-data-size-on-MonoRkNN-time-cost(k=10,Synthetic).png" width="200px"><br>I/O (Synthetic,k=10)</td>
+    <td align="center"><img src="images/Effect-of-data-size-on-MonoRkNN-time-cost(k=1000,Synthetic).png" width="200px"><br>Time (Synthetic,k=1000)</td>
+    <td align="center"><img src="images/Effect-of-data-size-on-MonoRkNN-io-cost(k=1000,Synthetic).png" width="200px"><br>I/O (Synthetic,k=1000)</td>  
+  </tr>
+  <tr>
+    <td align="center"><img src="images/Effect-of-data-size-on-MonoRkNN-time-cost(k=10,Real).png" width="200px"><br>Time (Real,k=10)</td>
+    <td align="center"><img src="images/Effect-of-data-size-on-MonoRkNN-io-cost(k=10,Real).png" width="200px"><br>I/O (Real,k=10)</td>
+    <td align="center"><img src="images/Effect-of-data-size-on-MonoRkNN-time-cost(k=1000,Real).png" width="200px"><br>Time (Real,k=1000)</td>
+    <td align="center"><img src="images/Effect-of-data-size-on-MonoRkNN-io-cost(k=1000,Real).png" width="200px"><br>I/O (Real,k=1000)</td>  
+  </tr>
+</table>
+
+```python
 >>> # effect of data size on Bi-RkNN
 >>> time_cost, io_cost = experiments.BenchmarkExperiments.evaluate_effect_of_data_size_on_BiRkNN(10)
 >>> plot_dual_distribution(time_cost)
@@ -122,7 +139,23 @@ If you want to evaluate the performance of CSD-R*k*NN against other algorithms (
 >>> time_cost, io_cost = experiments.BenchmarkExperiments.evaluate_effect_of_data_size_on_BiRkNN(1000)
 >>> plot_dual_distribution(time_cost)
 >>> plot_dual_distribution(io_cost)
->>> 
+```
+<table>
+  <tr>
+    <td align="center"><img src="images/Effect-of-data-size-on-BiRkNN-time-cost(k=10,Synthetic).png" width="200px"><br>Time (Synthetic,k=10)</td>
+    <td align="center"><img src="images/Effect-of-data-size-on-BiRkNN-time-cost(k=10,Synthetic).png" width="200px"><br>I/O (Synthetic,k=10)</td>
+    <td align="center"><img src="images/Effect-of-data-size-on-BiRkNN-time-cost(k=1000,Synthetic).png" width="200px"><br>Time (Synthetic,k=1000)</td>
+    <td align="center"><img src="images/Effect-of-data-size-on-BiRkNN-io-cost(k=1000,Synthetic).png" width="200px"><br>I/O (Synthetic,k=1000)</td>  
+  </tr>
+  <tr>
+    <td align="center"><img src="images/Effect-of-data-size-on-BiRkNN-time-cost(k=10,Real).png" width="200px"><br>Time (Real,k=10)</td>
+    <td align="center"><img src="images/Effect-of-data-size-on-BiRkNN-io-cost(k=10,Real).png" width="200px"><br>I/O (Real,k=10)</td>
+    <td align="center"><img src="images/Effect-of-data-size-on-BiRkNN-time-cost(k=1000,Real).png" width="200px"><br>Time (Real,k=1000)</td>
+    <td align="center"><img src="images/Effect-of-data-size-on-BiRkNN-io-cost(k=1000,Real).png" width="200px"><br>I/O (Real,k=1000)</td>  
+  </tr>
+</table>
+
+```python
 >>> # effect of k on Mono-RkNN
 >>> time_cost, io_cost = experiments.BenchmarkExperiments.evaluate_effect_of_k_on_MonoRkNN('Synthetic')
 >>> plot_dual_distribution(time_cost)
@@ -130,7 +163,18 @@ If you want to evaluate the performance of CSD-R*k*NN against other algorithms (
 >>> time_cost, io_cost = experiments.BenchmarkExperiments.evaluate_effect_of_k_on_MonoRkNN('Real')
 >>> plot_single_distribution(time_cost)
 >>> plot_single_distribution(io_cost)
->>> 
+```
+<table border="0px">
+  <tr>
+    <td align="center" border="0px"><img src="images/Effect-of-k-on-MonoRkNN-time-cost(Synthetic).png" width="200px"><br>Time (Synthetic)</td>
+    <td align="center" border="0px"><img src="images/Effect-of-k-on-MonoRkNN-io-cost(Synthetic).png" width="200px"><br>I/O (Synthetic)</td>
+    <td align="center" border="0px"><img src="images/Effect-of-k-on-MonoRkNN-time-cost(Real).png" width="200px"><br>Time (Real)</td>
+    <td align="center" border="0px"><img src="images/Effect-of-k-on-MonoRkNN-io-cost(Real).png" width="200px"><br>I/O (Real)</td>
+
+  </tr>
+</table>
+
+```python
 >>> # effect of k on Bi-RkNN
 >>> time_cost, io_cost = experiments.BenchmarkExperiments.evaluate_effect_of_k_on_BiRkNN('Synthetic')
 >>> plot_dual_distribution(time_cost)
@@ -138,7 +182,17 @@ If you want to evaluate the performance of CSD-R*k*NN against other algorithms (
 >>> time_cost, io_cost = experiments.BenchmarkExperiments.evaluate_effect_of_k_on_BiRkNN('Real')
 >>> plot_single_distribution(time_cost)
 >>> plot_single_distribution(io_cost)
->>> 
+```
+<table>
+  <tr>
+    <td align="center"><img src="images/Effect-of-k-on-BiRkNN-time-cost(Synthetic).png" width="200px"><br>Time (Synthetic)</td>
+    <td align="center"><img src="images/Effect-of-k-on-BiRkNN-io-cost(Synthetic).png" width="200px"><br>I/O (Synthetic)</td>
+    <td align="center"><img src="images/Effect-of-k-on-BiRkNN-time-cost(Real).png" width="200px"><br>Time (Real)</td>
+    <td align="center"><img src="images/Effect-of-k-on-BiRkNN-io-cost(Real).png" width="200px"><br>I/O (Real)</td>  
+  </tr>
+</table>
+
+```python
 >>> # effect of number of users relative to number of facilities
 >>> time_cost, io_cost = experiments.BenchmarkExperiments.evaluate_effect_of_user_num_relative_to_facility_num(10)
 >>> plot_dual_distribution(time_cost)
@@ -146,7 +200,17 @@ If you want to evaluate the performance of CSD-R*k*NN against other algorithms (
 >>> time_cost, io_cost = experiments.BenchmarkExperiments.evaluate_effect_of_user_num_relative_to_facility_num(1000)
 >>> plot_dual_distribution(time_cost)
 >>> plot_dual_distribution(io_cost)
+```
+<table>
+  <tr>
+    <td align="center"><img src="images/Effect-of-user-relative-to-facility-on-BiRkNN-time-cost(k=10).png" width="200px"><br>Time (k=10)</td>
+    <td align="center"><img src="images/Effect-of-user-relative-to-facility-on-BiRkNN-io-cost(k=10).png" width="200px"><br>I/O (k=10)</td>
+    <td align="center"><img src="images/Effect-of-user-relative-to-facility-on-BiRkNN-time-cost(k=1000).png" width="200px"><br>Time (k=1000)</td>
+    <td align="center"><img src="images/Effect-of-user-relative-to-facility-on-BiRkNN-io-cost(k=1000).png" width="200px"><br>I/O (k=1000)</td>  
+  </tr>
+</table>
 
+```python
 >>> # effect of data distribution
 >>> time_cost, io_cost = experiments.BenchmarkExperiments.evaluate_effect_of_data_distribution(10)
 >>> plot_single_distribution(time_cost)
@@ -154,27 +218,70 @@ If you want to evaluate the performance of CSD-R*k*NN against other algorithms (
 >>> time_cost, io_cost = experiments.BenchmarkExperiments.evaluate_effect_of_data_distribution(1000)
 >>> plot_single_distribution(time_cost)
 >>> plot_single_distribution(io_cost)
+```
+<table>
+  <tr>
+    <td align="center"><img src="images/Effect-of-distribution-on-BiRkNN-time-cost(k=10).png" width="400px"><br>Time (k=10)</td>
+    <td align="center"><img src="images/Effect-of-distribution-on-BiRkNN-io-cost(k=10).png" width="400px"><br>I/O (k=10)</td>  
+  </tr>
+  <tr>
+    <td align="center"><img src="images/Effect-of-distribution-on-BiRkNN-time-cost(k=1000).png" width="400px"><br>Time (k=1000)</td>
+    <td align="center"><img src="images/Effect-of-distribution-on-BiRkNN-io-cost(k=1000).png" width="400px"><br>I/O (k=1000)</td>  
+  </tr>
+</table>
 
->>> # evaluate RkNN queries for restaurant
+```python
+>>> # effect RkNN queries for restaurant
 >>> time_cost, io_cost = experiments.CaseStudyExperiments.evaluate_RkNN_for_restaurant()
 >>> plot_single_distribution(time_cost)
 >>> plot_single_distribution(io_cost)
+```
+<table align="center">
+  <tr>
+    <td align="center"><img src="images/Time-cost-of-RkNN-for-restaurant.png" width="200px"><br>Time cost (Restaurant)</td>
+    <td align="center"><img src="images/IO-cost-of-RkNN-for-restaurant.png" width="200px"><br>Number of I/Os (Restaurant)</td>
+  </tr>
+</table>
 
->>> # evaluate RkNN queries for mall
+```python
+>>> # effect RkNN queries for mall
 >>> time_cost, io_cost = experiments.CaseStudyExperiments.evaluate_RkNN_for_mall()
 >>> plot_single_distribution(time_cost)
 >>> plot_single_distribution(io_cost)
+```
+<table>
+  <tr>
+    <td align="center"><img src="images/Time-cost-of-RkNN-for-mall.png" width="200px"><br>Time cost (Mall)</td>
+    <td align="center"><img src="images/IO-cost-of-RkNN-for-mall.png" width="200px"><br>Number of I/Os (Mall)</td>
+  </tr>
+</table>
 
->>> # evaluate RkNN queries for hospital
+```python
+>>> # effect RkNN queries for hospital
 >>> time_cost, io_cost = experiments.CaseStudyExperiments.evaluate_RkNN_for_hospital()
 >>> plot_single_distribution(time_cost)
 >>> plot_single_distribution(io_cost)
+```
+<table>
+  <tr>
+    <td align="center"><img src="images/Time-cost-of-RkNN-for-hospital.png" width="200px"><br>Time cost (Hospital)</td>
+    <td align="center"><img src="images/IO-cost-of-RkNN-for-hospital.png" width="200px"><br>Number of I/Os (Hospital)</td>
+  </tr>
+</table>
 
->>> # evaluate RkNN queries for school
+```python
+>>> # effect RkNN queries for school
 >>> time_cost, io_cost = experiments.CaseStudyExperiments.evaluate_RkNN_for_school()
 >>> plot_single_distribution(time_cost)
 >>> plot_single_distribution(io_cost)
 ```
+<table>
+  <tr>
+    <td align="center"><img src="images/Time-cost-of-RkNN-for-school.png" width="200px"><br>Time cost (School)</td>
+    <td align="center"><img src="images/IO-cost-of-RkNN-for-school.png" width="200px"><br>Number of I/Os (School)</td>
+  </tr>
+</table>
+
 Alternatively, you can run test.py on the terminal directly:
 ```
  python3 test.py
