@@ -5,10 +5,10 @@ from uuid import uuid1 as generate_uuid
 from shapely.geometry import Point, Polygon
 from shapely.geometry.base import BaseGeometry
 from shapely.ops import unary_union
+from tqdm import tqdm
 
 from common.data_structure import MinHeap, NSmallestHolder
 
-# from rtree import Rtree
 from common.persistence import PersistentDict
 
 
@@ -50,9 +50,6 @@ class NodePool(object):
         self.database.reset()
         self.cache.clear()
 
-    # def close(self):
-    #     self.database.close()
-
 
 class RtreeIndex(object):
     class Properties:
@@ -65,13 +62,18 @@ class RtreeIndex(object):
         path = kwargs.get('path', None)
         self.MAX_CHILDREN_NUM = kwargs.get('max_children_num', 10)
         self.MIN_CHILDREN_NUM = kwargs.get('min_children_num', self.MAX_CHILDREN_NUM / 2)
-        data = kwargs.get('data', [])
+
         self._database = None
         self._nodes = None
         self._properties = None
         self.path = path
-        for uuid, geom in data:
-            self.insert(uuid, geom)
+        data = kwargs.get('data', None)
+        if data is not None:
+            with tqdm(total=len(data), unit='item') as bar:
+                bar.set_description('Building R-tree')
+                for uuid, geom in data:
+                    self.insert(uuid, geom)
+                    bar.update()
 
     def close(self):
         self.database.close()

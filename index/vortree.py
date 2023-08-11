@@ -2,6 +2,7 @@
 
 from scipy.spatial.qhull import Voronoi
 from shapely.geometry import Point
+from tqdm import tqdm
 
 from common.data_structure import MinHeap
 from index.rtree import RtreeIndex, RtreeNode
@@ -10,15 +11,19 @@ from index.rtree import RtreeIndex, RtreeNode
 class VoRtreeIndex(RtreeIndex):
     def __init__(self, **kwargs):
         RtreeIndex.__init__(self, **kwargs)
-        data = kwargs.get('data', [])
-        if len(data) > 0:
-            voronoi = Voronoi([(geom.x, geom.y) for uuid, geom in data])
-            for ids in voronoi.ridge_points:
-                nodes = [self.nodes[data[i][0]] for i in ids]
-                nodes[0].add_neighbor(nodes[1])
-                nodes[1].add_neighbor(nodes[0])
-            for uuid, geom in data:
-                self.nodes[uuid].dumps()
+        data = kwargs.get('data', None)
+        if data is not None:
+            with tqdm(total=len(data), unit='item') as bar:
+                bar.set_description('Building Voronoi diagram ')
+                voronoi = Voronoi([(geom.x, geom.y) for uuid, geom in data])
+                for ids in voronoi.ridge_points:
+                    nodes = [self.nodes[data[i][0]] for i in ids]
+                    nodes[0].add_neighbor(nodes[1])
+                    nodes[1].add_neighbor(nodes[0])
+                for uuid, geom in data:
+                    self.nodes[uuid].dumps()
+                    bar.update()
+                print('\033[38;2;116;20;12m'+f'VoR-tree({self.path}) is complete'+'\033[39m')
 
     def new_node(self, uuid, geom, child_ids, level):
         node = VoRtreeNode(self, uuid, geom, child_ids, None, level)
