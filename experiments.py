@@ -120,12 +120,14 @@ def generate_points(n, distribution, bounds=None):
         return data
 
 
-def get_points_from_txt(path):
+def get_points_from_txt(n, path):
     with open(os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'CSD-RkNN/' + path)) as f:
-        data = list()
+        points = list()
         for line in f.readlines():
             line_str = line.strip().split()
-            data.append((line_str[0], Point(float(line_str[1]), float(line_str[2]))))
+            points.append(Point(float(line_str[1]), float(line_str[2])))
+        points = random.sample(points, n)
+        data = [(str(i), p) for i, p in enumerate(points)]
         return data
 
 
@@ -139,9 +141,9 @@ def exist_index(name, distribution=None, n=None):
 def create_index(name, distribution=None, n=None):
     if distribution == 'Real':
         if name == 'User':
-            data = get_points_from_txt('data/North America-1.txt')
+            data = get_points_from_txt(n, 'data/North America-1.txt')
         if name == 'Facility':
-            data = get_points_from_txt('data/North America-2.txt')
+            data = get_points_from_txt(n, 'data/North America-2.txt')
     elif distribution == 'Uniform' or distribution == 'Normal':
         data = generate_points(n, distribution)
     elif distribution == 'Wuhan':
@@ -160,7 +162,6 @@ def create_index(name, distribution=None, n=None):
         path += '-' + str(n)
     index = VoRtreeIndex(path=path, data=data)
     index.close()
-    print(path + ' Complete')
 
 
 def load_index(name, distribution=None, n=None):
@@ -184,13 +185,8 @@ def create_temp_index_copy(name, distribution=None, n=None):
 
 
 def random_ids(n, name, distribution, size=None):
-    if distribution == 'Uniform' or distribution == 'Normal':
+    if distribution == 'Uniform' or distribution == 'Normal' or distribution == 'Real':
         return [str(i) for i in random.sample(range(0, size), n)]
-    elif distribution == 'Real':
-        if name == 'User':
-            return [i for i, p in random.sample(get_points_from_txt('data/North America-1.txt'), n)]
-        if name == 'Facility':
-            return [i for i, p in random.sample(get_points_from_txt('data/North America-2.txt'), n)]
     elif distribution == 'Wuhan':
         if name == 'School':
             return [i for i, p in random.sample(get_points_from_csv('data/school.csv'), n)]
@@ -213,8 +209,8 @@ def delete_index(name, distribution, n):
 
 class BenchmarkExperiments:
     @staticmethod
-    def evaluate_effect_of_data_size_on_MonoRkNN(k, distribution=None, times=None):
-        if distribution is None:
+    def evaluate_effect_of_data_size_on_MonoRkNN(k, distribution, times=None):
+        if distribution == 'Synthetic':
             uniform_time_v, uniform_io_v = BenchmarkExperiments.evaluate_effect_of_data_size_on_MonoRkNN(k, 'Uniform',
                                                                                                          times)
             normal_time_v, normal_io_v = BenchmarkExperiments.evaluate_effect_of_data_size_on_MonoRkNN(k, 'Normal',
@@ -227,7 +223,10 @@ class BenchmarkExperiments:
         else:
             if times is None:
                 times = default_times
-            data_sizes = [50000, 100000, 150000, 200000]
+            if distribution == 'Real':
+                data_sizes = [21975, 43950, 65925, 87901]
+            else:
+                data_sizes = [50000, 100000, 150000, 200000]
             csd_time_cost = []
             vr_time_cost = []
             slice_time_cost = []
@@ -248,8 +247,11 @@ class BenchmarkExperiments:
                     facility_index.close()
                     io_cost.append(st.io_count)
                     facility_index.drop_file()
-                vr_time_cost.append({'mean': round(round(np.mean(time_cost), 2), 2), 'median':round(np.median(time_cost), 2),'std':np.std(time_cost)})
-                vr_io_cost.append({'mean': round(np.mean(io_cost), 1), 'median':round(np.median(io_cost), 1),'std':round(np.std(io_cost), 1)})
+                vr_time_cost.append(
+                    {'mean': round(round(np.mean(time_cost), 2), 2), 'median': round(np.median(time_cost), 2),
+                     'std': np.std(time_cost)})
+                vr_io_cost.append({'mean': round(np.mean(io_cost), 1), 'median': round(np.median(io_cost), 1),
+                                   'std': round(np.std(io_cost), 1)})
                 # SLICE
                 time_cost = []
                 io_cost = []
@@ -262,8 +264,11 @@ class BenchmarkExperiments:
                     facility_index.close()
                     io_cost.append(st.io_count)
                     facility_index.drop_file()
-                slice_time_cost.append({'mean': round(round(np.mean(time_cost), 2), 2), 'median':round(np.median(time_cost), 2),'std':np.std(time_cost)})
-                slice_io_cost.append({'mean': round(np.mean(io_cost), 1), 'median':round(np.median(io_cost), 1),'std':round(np.std(io_cost), 1)})
+                slice_time_cost.append(
+                    {'mean': round(round(np.mean(time_cost), 2), 2), 'median': round(np.median(time_cost), 2),
+                     'std': np.std(time_cost)})
+                slice_io_cost.append({'mean': round(np.mean(io_cost), 1), 'median': round(np.median(io_cost), 1),
+                                      'std': round(np.std(io_cost), 1)})
                 # CSD
                 time_cost = []
                 io_cost = []
@@ -276,8 +281,11 @@ class BenchmarkExperiments:
                     facility_index.close()
                     io_cost.append(st.io_count)
                     facility_index.drop_file()
-                csd_time_cost.append({'mean': round(round(np.mean(time_cost), 2), 2), 'median':round(np.median(time_cost), 2),'std':np.std(time_cost)})
-                csd_io_cost.append({'mean': round(np.mean(io_cost), 1), 'median':round(np.median(io_cost), 1),'std':round(np.std(io_cost), 1)})
+                csd_time_cost.append(
+                    {'mean': round(round(np.mean(time_cost), 2), 2), 'median': round(np.median(time_cost), 2),
+                     'std': np.std(time_cost)})
+                csd_io_cost.append({'mean': round(np.mean(io_cost), 1), 'median': round(np.median(io_cost), 1),
+                                    'std': round(np.std(io_cost), 1)})
             time_v = dict()
             time_v['data'] = {'VR': vr_time_cost, 'SLICE': slice_time_cost, 'CSD': csd_time_cost}
             time_v['x_tick_labels'] = data_sizes
@@ -292,8 +300,8 @@ class BenchmarkExperiments:
             return time_v, io_v
 
     @staticmethod
-    def evaluate_effect_of_data_size_on_BiRkNN(k, distribution=None, times=None):
-        if distribution is None:
+    def evaluate_effect_of_data_size_on_BiRkNN(k, distribution, times=None):
+        if distribution == 'Synthetic':
             uniform_time_v, uniform_io_v = BenchmarkExperiments.evaluate_effect_of_data_size_on_BiRkNN(k, 'Uniform',
                                                                                                        times)
             normal_time_v, normal_io_v = BenchmarkExperiments.evaluate_effect_of_data_size_on_BiRkNN(k, 'Normal', times)
@@ -305,7 +313,10 @@ class BenchmarkExperiments:
         else:
             if times is None:
                 times = default_times
-            data_sizes = [50000, 100000, 150000, 200000]
+            if distribution == 'Real':
+                data_sizes = [21975, 43950, 65925, 87901]
+            else:
+                data_sizes = [50000, 100000, 150000, 200000]
             csd_time_cost = []
             vr_time_cost = []
             slice_time_cost = []
@@ -329,8 +340,11 @@ class BenchmarkExperiments:
                     io_cost.append(st.io_count)
                     facility_index.drop_file()
                     user_index.drop_file()
-                vr_time_cost.append({'mean': round(round(np.mean(time_cost), 2), 2), 'median':round(np.median(time_cost), 2),'std':np.std(time_cost)})
-                vr_io_cost.append({'mean': round(np.mean(io_cost), 1), 'median':round(np.median(io_cost), 1),'std':round(np.std(io_cost), 1)})
+                vr_time_cost.append(
+                    {'mean': round(round(np.mean(time_cost), 2), 2), 'median': round(np.median(time_cost), 2),
+                     'std': np.std(time_cost)})
+                vr_io_cost.append({'mean': round(np.mean(io_cost), 1), 'median': round(np.median(io_cost), 1),
+                                   'std': round(np.std(io_cost), 1)})
                 # SLICE
                 time_cost = []
                 io_cost = []
@@ -346,8 +360,11 @@ class BenchmarkExperiments:
                     io_cost.append(st.io_count)
                     facility_index.drop_file()
                     user_index.drop_file()
-                slice_time_cost.append({'mean': round(round(np.mean(time_cost), 2), 2), 'median':round(np.median(time_cost), 2),'std':np.std(time_cost)})
-                slice_io_cost.append({'mean': round(np.mean(io_cost), 1), 'median':round(np.median(io_cost), 1),'std':round(np.std(io_cost), 1)})
+                slice_time_cost.append(
+                    {'mean': round(round(np.mean(time_cost), 2), 2), 'median': round(np.median(time_cost), 2),
+                     'std': np.std(time_cost)})
+                slice_io_cost.append({'mean': round(np.mean(io_cost), 1), 'median': round(np.median(io_cost), 1),
+                                      'std': round(np.std(io_cost), 1)})
                 # CSD
                 time_cost = []
                 io_cost = []
@@ -363,8 +380,11 @@ class BenchmarkExperiments:
                     io_cost.append(st.io_count)
                     facility_index.drop_file()
                     user_index.drop_file()
-                csd_time_cost.append({'mean': round(round(np.mean(time_cost), 2), 2), 'median':round(np.median(time_cost), 2),'std':np.std(time_cost)})
-                csd_io_cost.append({'mean': round(np.mean(io_cost), 1), 'median':round(np.median(io_cost), 1),'std':round(np.std(io_cost), 1)})
+                csd_time_cost.append(
+                    {'mean': round(round(np.mean(time_cost), 2), 2), 'median': round(np.median(time_cost), 2),
+                     'std': np.std(time_cost)})
+                csd_io_cost.append({'mean': round(np.mean(io_cost), 1), 'median': round(np.median(io_cost), 1),
+                                    'std': round(np.std(io_cost), 1)})
             time_v = dict()
             time_v['data'] = {'VR': vr_time_cost, 'SLICE': slice_time_cost, 'CSD': csd_time_cost}
             time_v['x_tick_labels'] = data_sizes
@@ -392,7 +412,7 @@ class BenchmarkExperiments:
                 times = default_times
             k_list = [1, 10, 100, 1000]
             if distribution == 'Real':
-                data_size = None
+                data_size = 87901
             else:
                 data_size = 100000
             csd_time_cost = []
@@ -415,8 +435,11 @@ class BenchmarkExperiments:
                     facility_index.close()
                     io_cost.append(st.io_count)
                     facility_index.drop_file()
-                vr_time_cost.append({'mean': round(round(np.mean(time_cost), 2), 2), 'median':round(np.median(time_cost), 2),'std':np.std(time_cost)})
-                vr_io_cost.append({'mean': round(np.mean(io_cost), 1), 'median':round(np.median(io_cost), 1),'std':round(np.std(io_cost), 1)})
+                vr_time_cost.append(
+                    {'mean': round(round(np.mean(time_cost), 2), 2), 'median': round(np.median(time_cost), 2),
+                     'std': np.std(time_cost)})
+                vr_io_cost.append({'mean': round(np.mean(io_cost), 1), 'median': round(np.median(io_cost), 1),
+                                   'std': round(np.std(io_cost), 1)})
                 # SLICE
                 time_cost = []
                 io_cost = []
@@ -429,8 +452,11 @@ class BenchmarkExperiments:
                     facility_index.close()
                     io_cost.append(st.io_count)
                     facility_index.drop_file()
-                slice_time_cost.append({'mean': round(round(np.mean(time_cost), 2), 2), 'median':round(np.median(time_cost), 2),'std':np.std(time_cost)})
-                slice_io_cost.append({'mean': round(np.mean(io_cost), 1), 'median':round(np.median(io_cost), 1),'std':round(np.std(io_cost), 1)})
+                slice_time_cost.append(
+                    {'mean': round(round(np.mean(time_cost), 2), 2), 'median': round(np.median(time_cost), 2),
+                     'std': np.std(time_cost)})
+                slice_io_cost.append({'mean': round(np.mean(io_cost), 1), 'median': round(np.median(io_cost), 1),
+                                      'std': round(np.std(io_cost), 1)})
                 # CSD
                 time_cost = []
                 io_cost = []
@@ -443,8 +469,11 @@ class BenchmarkExperiments:
                     facility_index.close()
                     io_cost.append(st.io_count)
                     facility_index.drop_file()
-                csd_time_cost.append({'mean': round(round(np.mean(time_cost), 2), 2), 'median':round(np.median(time_cost), 2),'std':np.std(time_cost)})
-                csd_io_cost.append({'mean': round(np.mean(io_cost), 1), 'median':round(np.median(io_cost), 1),'std':round(np.std(io_cost), 1)})
+                csd_time_cost.append(
+                    {'mean': round(round(np.mean(time_cost), 2), 2), 'median': round(np.median(time_cost), 2),
+                     'std': np.std(time_cost)})
+                csd_io_cost.append({'mean': round(np.mean(io_cost), 1), 'median': round(np.median(io_cost), 1),
+                                    'std': round(np.std(io_cost), 1)})
             time_v = dict()
             time_v['data'] = {'VR': vr_time_cost, 'SLICE': slice_time_cost, 'CSD': csd_time_cost}
             time_v['x_tick_labels'] = k_list
@@ -471,10 +500,10 @@ class BenchmarkExperiments:
         else:
             if times is None:
                 times = default_times
-            k_list = [1, 10, 100, 1000]
+            k_list = [1, 10, 10, 10]
             if distribution == 'Real':
-                user_data_size = None
-                facility_data_size = None
+                user_data_size = 87901
+                facility_data_size = 87901
             else:
                 user_data_size = 100000
                 facility_data_size = 100000
@@ -501,8 +530,11 @@ class BenchmarkExperiments:
                     io_cost.append(st.io_count)
                     facility_index.drop_file()
                     user_index.drop_file()
-                vr_time_cost.append({'mean': round(round(np.mean(time_cost), 2), 2), 'median':round(np.median(time_cost), 2),'std':np.std(time_cost)})
-                vr_io_cost.append({'mean': round(np.mean(io_cost), 1), 'median':round(np.median(io_cost), 1),'std':round(np.std(io_cost), 1)})
+                vr_time_cost.append(
+                    {'mean': round(round(np.mean(time_cost), 2), 2), 'median': round(np.median(time_cost), 2),
+                     'std': np.std(time_cost)})
+                vr_io_cost.append({'mean': round(np.mean(io_cost), 1), 'median': round(np.median(io_cost), 1),
+                                   'std': round(np.std(io_cost), 1)})
                 # SLICE
                 time_cost = []
                 io_cost = []
@@ -518,8 +550,11 @@ class BenchmarkExperiments:
                     io_cost.append(st.io_count)
                     facility_index.drop_file()
                     user_index.drop_file()
-                slice_time_cost.append({'mean': round(round(np.mean(time_cost), 2), 2), 'median':round(np.median(time_cost), 2),'std':np.std(time_cost)})
-                slice_io_cost.append({'mean': round(np.mean(io_cost), 1), 'median':round(np.median(io_cost), 1),'std':round(np.std(io_cost), 1)})
+                slice_time_cost.append(
+                    {'mean': round(round(np.mean(time_cost), 2), 2), 'median': round(np.median(time_cost), 2),
+                     'std': np.std(time_cost)})
+                slice_io_cost.append({'mean': round(np.mean(io_cost), 1), 'median': round(np.median(io_cost), 1),
+                                      'std': round(np.std(io_cost), 1)})
                 # CSD
                 time_cost = []
                 io_cost = []
@@ -535,8 +570,11 @@ class BenchmarkExperiments:
                     io_cost.append(st.io_count)
                     facility_index.drop_file()
                     user_index.drop_file()
-                csd_time_cost.append({'mean': round(round(np.mean(time_cost), 2), 2), 'median':round(np.median(time_cost), 2),'std':np.std(time_cost)})
-                csd_io_cost.append({'mean': round(np.mean(io_cost), 1), 'median':round(np.median(io_cost), 1),'std':round(np.std(io_cost), 1)})
+                csd_time_cost.append(
+                    {'mean': round(round(np.mean(time_cost), 2), 2), 'median': round(np.median(time_cost), 2),
+                     'std': np.std(time_cost)})
+                csd_io_cost.append({'mean': round(np.mean(io_cost), 1), 'median': round(np.median(io_cost), 1),
+                                    'std': round(np.std(io_cost), 1)})
             time_v = dict()
             time_v['data'] = {'VR': vr_time_cost, 'SLICE': slice_time_cost, 'CSD': csd_time_cost}
             time_v['x_tick_labels'] = k_list
@@ -561,16 +599,10 @@ class BenchmarkExperiments:
         vr_io_cost = []
         slice_io_cost = []
         for facility_distribution in distributions:
-            if facility_distribution == 'Real':
-                facility_data_size = None
-            else:
-                facility_data_size = 87902
+            facility_data_size = 87901
             q_ids = random_ids(times, 'Facility', facility_distribution, facility_data_size)
             for user_distribution in distributions:
-                if user_distribution == 'Real':
-                    user_data_size = None
-                else:
-                    user_data_size = 87901
+                user_data_size = 87901
                 # VR
                 time_cost = []
                 io_cost = []
@@ -586,8 +618,11 @@ class BenchmarkExperiments:
                     io_cost.append(st.io_count)
                     facility_index.drop_file()
                     user_index.drop_file()
-                vr_time_cost.append({'mean': round(round(np.mean(time_cost), 2), 2), 'median':round(np.median(time_cost), 2),'std':np.std(time_cost)})
-                vr_io_cost.append({'mean': round(np.mean(io_cost), 1), 'median':round(np.median(io_cost), 1),'std':round(np.std(io_cost), 1)})
+                vr_time_cost.append(
+                    {'mean': round(round(np.mean(time_cost), 2), 2), 'median': round(np.median(time_cost), 2),
+                     'std': np.std(time_cost)})
+                vr_io_cost.append({'mean': round(np.mean(io_cost), 1), 'median': round(np.median(io_cost), 1),
+                                   'std': round(np.std(io_cost), 1)})
                 # SLICE
                 time_cost = []
                 io_cost = []
@@ -603,8 +638,11 @@ class BenchmarkExperiments:
                     io_cost.append(st.io_count)
                     facility_index.drop_file()
                     user_index.drop_file()
-                slice_time_cost.append({'mean': round(round(np.mean(time_cost), 2), 2), 'median':round(np.median(time_cost), 2),'std':np.std(time_cost)})
-                slice_io_cost.append({'mean': round(np.mean(io_cost), 1), 'median':round(np.median(io_cost), 1),'std':round(np.std(io_cost), 1)})
+                slice_time_cost.append(
+                    {'mean': round(round(np.mean(time_cost), 2), 2), 'median': round(np.median(time_cost), 2),
+                     'std': np.std(time_cost)})
+                slice_io_cost.append({'mean': round(np.mean(io_cost), 1), 'median': round(np.median(io_cost), 1),
+                                      'std': round(np.std(io_cost), 1)})
                 # CSD
                 time_cost = []
                 io_cost = []
@@ -620,8 +658,11 @@ class BenchmarkExperiments:
                     io_cost.append(st.io_count)
                     facility_index.drop_file()
                     user_index.drop_file()
-                csd_time_cost.append({'mean': round(round(np.mean(time_cost), 2), 2), 'median':round(np.median(time_cost), 2),'std':np.std(time_cost)})
-                csd_io_cost.append({'mean': round(np.mean(io_cost), 1), 'median':round(np.median(io_cost), 1),'std':round(np.std(io_cost), 1)})
+                csd_time_cost.append(
+                    {'mean': round(round(np.mean(time_cost), 2), 2), 'median': round(np.median(time_cost), 2),
+                     'std': np.std(time_cost)})
+                csd_io_cost.append({'mean': round(np.mean(io_cost), 1), 'median': round(np.median(io_cost), 1),
+                                    'std': round(np.std(io_cost), 1)})
         time_v = dict()
         time_v['data'] = {'VR': vr_time_cost, 'SLICE': slice_time_cost, 'CSD': csd_time_cost}
         time_v['x_tick_labels'] = ['(U,U)', '(U,R)', '(U,N)', '(R,U)', '(R,R)', '(R,N)', '(N,U)', '(N,R)', '(N,N)']
@@ -677,8 +718,11 @@ class BenchmarkExperiments:
                     io_cost.append(st.io_count)
                     user_index.drop_file()
                     facility_index.drop_file()
-                vr_time_cost.append({'mean': round(round(np.mean(time_cost), 2), 2), 'median':round(np.median(time_cost), 2),'std':np.std(time_cost)})
-                vr_io_cost.append({'mean': round(np.mean(io_cost), 1), 'median':round(np.median(io_cost), 1),'std':round(np.std(io_cost), 1)})
+                vr_time_cost.append(
+                    {'mean': round(round(np.mean(time_cost), 2), 2), 'median': round(np.median(time_cost), 2),
+                     'std': np.std(time_cost)})
+                vr_io_cost.append({'mean': round(np.mean(io_cost), 1), 'median': round(np.median(io_cost), 1),
+                                   'std': round(np.std(io_cost), 1)})
                 # SLICE
                 time_cost = []
                 io_cost = []
@@ -694,8 +738,11 @@ class BenchmarkExperiments:
                     io_cost.append(st.io_count)
                     user_index.drop_file()
                     facility_index.drop_file()
-                slice_time_cost.append({'mean': round(round(np.mean(time_cost), 2), 2), 'median':round(np.median(time_cost), 2),'std':np.std(time_cost)})
-                slice_io_cost.append({'mean': round(np.mean(io_cost), 1), 'median':round(np.median(io_cost), 1),'std':round(np.std(io_cost), 1)})
+                slice_time_cost.append(
+                    {'mean': round(round(np.mean(time_cost), 2), 2), 'median': round(np.median(time_cost), 2),
+                     'std': np.std(time_cost)})
+                slice_io_cost.append({'mean': round(np.mean(io_cost), 1), 'median': round(np.median(io_cost), 1),
+                                      'std': round(np.std(io_cost), 1)})
                 # CSD
                 time_cost = []
                 io_cost = []
@@ -711,8 +758,11 @@ class BenchmarkExperiments:
                     io_cost.append(st.io_count)
                     user_index.drop_file()
                     facility_index.drop_file()
-                csd_time_cost.append({'mean': round(round(np.mean(time_cost), 2), 2), 'median':round(np.median(time_cost), 2),'std':np.std(time_cost)})
-                csd_io_cost.append({'mean': round(np.mean(io_cost), 1), 'median':round(np.median(io_cost), 1),'std':round(np.std(io_cost), 1)})
+                csd_time_cost.append(
+                    {'mean': round(round(np.mean(time_cost), 2), 2), 'median': round(np.median(time_cost), 2),
+                     'std': np.std(time_cost)})
+                csd_io_cost.append({'mean': round(np.mean(io_cost), 1), 'median': round(np.median(io_cost), 1),
+                                    'std': round(np.std(io_cost), 1)})
             time_v = dict()
             time_v['data'] = {'VR': vr_time_cost, 'SLICE': slice_time_cost, 'CSD': csd_time_cost}
             time_v['x_tick_labels'] = [str(int(s * 100)) + '%' for s in scales]
@@ -757,8 +807,11 @@ class CaseStudyExperiments:
                 io_cost.append(st.io_count)
                 educational_institution_index.drop_file()
                 residential_district_index.drop_file()
-            vr_time_cost.append({'mean': round(round(np.mean(time_cost), 2), 2), 'median':round(np.median(time_cost), 2),'std':np.std(time_cost)})
-            vr_io_cost.append({'mean': round(np.mean(io_cost), 1), 'median':round(np.median(io_cost), 1),'std':round(np.std(io_cost), 1)})
+            vr_time_cost.append(
+                {'mean': round(round(np.mean(time_cost), 2), 2), 'median': round(np.median(time_cost), 2),
+                 'std': np.std(time_cost)})
+            vr_io_cost.append({'mean': round(np.mean(io_cost), 1), 'median': round(np.median(io_cost), 1),
+                               'std': round(np.std(io_cost), 1)})
             # SLICE
             time_cost = []
             io_cost = []
@@ -775,8 +828,11 @@ class CaseStudyExperiments:
                 io_cost.append(st.io_count)
                 educational_institution_index.drop_file()
                 residential_district_index.drop_file()
-            slice_time_cost.append({'mean': round(round(np.mean(time_cost), 2), 2), 'median':round(np.median(time_cost), 2),'std':np.std(time_cost)})
-            slice_io_cost.append({'mean': round(np.mean(io_cost), 1), 'median':round(np.median(io_cost), 1),'std':round(np.std(io_cost), 1)})
+            slice_time_cost.append(
+                {'mean': round(round(np.mean(time_cost), 2), 2), 'median': round(np.median(time_cost), 2),
+                 'std': np.std(time_cost)})
+            slice_io_cost.append({'mean': round(np.mean(io_cost), 1), 'median': round(np.median(io_cost), 1),
+                                  'std': round(np.std(io_cost), 1)})
             # CSD
             time_cost = []
             io_cost = []
@@ -793,8 +849,11 @@ class CaseStudyExperiments:
                 io_cost.append(st.io_count)
                 educational_institution_index.drop_file()
                 residential_district_index.drop_file()
-            csd_time_cost.append({'mean': round(round(np.mean(time_cost), 2), 2), 'median':round(np.median(time_cost), 2),'std':np.std(time_cost)})
-            csd_io_cost.append({'mean': round(np.mean(io_cost), 1), 'median':round(np.median(io_cost), 1),'std':round(np.std(io_cost), 1)})
+            csd_time_cost.append(
+                {'mean': round(round(np.mean(time_cost), 2), 2), 'median': round(np.median(time_cost), 2),
+                 'std': np.std(time_cost)})
+            csd_io_cost.append({'mean': round(np.mean(io_cost), 1), 'median': round(np.median(io_cost), 1),
+                                'std': round(np.std(io_cost), 1)})
         time_v = dict()
         time_v['data'] = {'VR': vr_time_cost, 'SLICE': slice_time_cost, 'CSD': csd_time_cost}
         time_v['x_tick_labels'] = k_list
@@ -835,8 +894,11 @@ class CaseStudyExperiments:
                 io_cost.append(st.io_count)
                 mall_index.drop_file()
                 residential_district_index.drop_file()
-            vr_time_cost.append({'mean': round(round(np.mean(time_cost), 2), 2), 'median':round(np.median(time_cost), 2),'std':np.std(time_cost)})
-            vr_io_cost.append({'mean': round(np.mean(io_cost), 1), 'median':round(np.median(io_cost), 1),'std':round(np.std(io_cost), 1)})
+            vr_time_cost.append(
+                {'mean': round(round(np.mean(time_cost), 2), 2), 'median': round(np.median(time_cost), 2),
+                 'std': np.std(time_cost)})
+            vr_io_cost.append({'mean': round(np.mean(io_cost), 1), 'median': round(np.median(io_cost), 1),
+                               'std': round(np.std(io_cost), 1)})
             # SLICE
             time_cost = []
             io_cost = []
@@ -852,8 +914,11 @@ class CaseStudyExperiments:
                 io_cost.append(st.io_count)
                 mall_index.drop_file()
                 residential_district_index.drop_file()
-            slice_time_cost.append({'mean': round(round(np.mean(time_cost), 2), 2), 'median':round(np.median(time_cost), 2),'std':np.std(time_cost)})
-            slice_io_cost.append({'mean': round(np.mean(io_cost), 1), 'median':round(np.median(io_cost), 1),'std':round(np.std(io_cost), 1)})
+            slice_time_cost.append(
+                {'mean': round(round(np.mean(time_cost), 2), 2), 'median': round(np.median(time_cost), 2),
+                 'std': np.std(time_cost)})
+            slice_io_cost.append({'mean': round(np.mean(io_cost), 1), 'median': round(np.median(io_cost), 1),
+                                  'std': round(np.std(io_cost), 1)})
             # CSD
             time_cost = []
             io_cost = []
@@ -869,8 +934,11 @@ class CaseStudyExperiments:
                 io_cost.append(st.io_count)
                 mall_index.drop_file()
                 residential_district_index.drop_file()
-            csd_time_cost.append({'mean': round(round(np.mean(time_cost), 2), 2), 'median':round(np.median(time_cost), 2),'std':np.std(time_cost)})
-            csd_io_cost.append({'mean': round(np.mean(io_cost), 1), 'median':round(np.median(io_cost), 1),'std':round(np.std(io_cost), 1)})
+            csd_time_cost.append(
+                {'mean': round(round(np.mean(time_cost), 2), 2), 'median': round(np.median(time_cost), 2),
+                 'std': np.std(time_cost)})
+            csd_io_cost.append({'mean': round(np.mean(io_cost), 1), 'median': round(np.median(io_cost), 1),
+                                'std': round(np.std(io_cost), 1)})
         time_v = dict()
         time_v['data'] = {'VR': vr_time_cost, 'SLICE': slice_time_cost, 'CSD': csd_time_cost}
         time_v['x_tick_labels'] = k_list
@@ -912,8 +980,11 @@ class CaseStudyExperiments:
                 io_cost.append(st.io_count)
                 medical_institution_index.drop_file()
                 residential_district_index.drop_file()
-            vr_time_cost.append({'mean': round(round(np.mean(time_cost), 2), 2), 'median':round(np.median(time_cost), 2),'std':np.std(time_cost)})
-            vr_io_cost.append({'mean': round(np.mean(io_cost), 1), 'median':round(np.median(io_cost), 1),'std':round(np.std(io_cost), 1)})
+            vr_time_cost.append(
+                {'mean': round(round(np.mean(time_cost), 2), 2), 'median': round(np.median(time_cost), 2),
+                 'std': np.std(time_cost)})
+            vr_io_cost.append({'mean': round(np.mean(io_cost), 1), 'median': round(np.median(io_cost), 1),
+                               'std': round(np.std(io_cost), 1)})
             # SLICE
             time_cost = []
             io_cost = []
@@ -930,8 +1001,11 @@ class CaseStudyExperiments:
                 io_cost.append(st.io_count)
                 medical_institution_index.drop_file()
                 residential_district_index.drop_file()
-            slice_time_cost.append({'mean': round(round(np.mean(time_cost), 2), 2), 'median':round(np.median(time_cost), 2),'std':np.std(time_cost)})
-            slice_io_cost.append({'mean': round(np.mean(io_cost), 1), 'median':round(np.median(io_cost), 1),'std':round(np.std(io_cost), 1)})
+            slice_time_cost.append(
+                {'mean': round(round(np.mean(time_cost), 2), 2), 'median': round(np.median(time_cost), 2),
+                 'std': np.std(time_cost)})
+            slice_io_cost.append({'mean': round(np.mean(io_cost), 1), 'median': round(np.median(io_cost), 1),
+                                  'std': round(np.std(io_cost), 1)})
             # CSD
             time_cost = []
             io_cost = []
@@ -948,8 +1022,11 @@ class CaseStudyExperiments:
                 io_cost.append(st.io_count)
                 medical_institution_index.drop_file()
                 residential_district_index.drop_file()
-            csd_time_cost.append({'mean': round(round(np.mean(time_cost), 2), 2), 'median':round(np.median(time_cost), 2),'std':np.std(time_cost)})
-            csd_io_cost.append({'mean': round(np.mean(io_cost), 1), 'median':round(np.median(io_cost), 1),'std':round(np.std(io_cost), 1)})
+            csd_time_cost.append(
+                {'mean': round(round(np.mean(time_cost), 2), 2), 'median': round(np.median(time_cost), 2),
+                 'std': np.std(time_cost)})
+            csd_io_cost.append({'mean': round(np.mean(io_cost), 1), 'median': round(np.median(io_cost), 1),
+                                'std': round(np.std(io_cost), 1)})
         time_v = dict()
         time_v['data'] = {'VR': vr_time_cost, 'SLICE': slice_time_cost, 'CSD': csd_time_cost}
         time_v['x_tick_labels'] = k_list
@@ -990,8 +1067,11 @@ class CaseStudyExperiments:
                 io_cost.append(st.io_count)
                 restaurant_index.drop_file()
                 residential_district_index.drop_file()
-            vr_time_cost.append({'mean': round(round(np.mean(time_cost), 2), 2), 'median':round(np.median(time_cost), 2),'std':np.std(time_cost)})
-            vr_io_cost.append({'mean': round(np.mean(io_cost), 1), 'median':round(np.median(io_cost), 1),'std':round(np.std(io_cost), 1)})
+            vr_time_cost.append(
+                {'mean': round(round(np.mean(time_cost), 2), 2), 'median': round(np.median(time_cost), 2),
+                 'std': np.std(time_cost)})
+            vr_io_cost.append({'mean': round(np.mean(io_cost), 1), 'median': round(np.median(io_cost), 1),
+                               'std': round(np.std(io_cost), 1)})
             # SLICE
             time_cost = []
             io_cost = []
@@ -1007,8 +1087,11 @@ class CaseStudyExperiments:
                 io_cost.append(st.io_count)
                 restaurant_index.drop_file()
                 residential_district_index.drop_file()
-            slice_time_cost.append({'mean': round(round(np.mean(time_cost), 2), 2), 'median':round(np.median(time_cost), 2),'std':np.std(time_cost)})
-            slice_io_cost.append({'mean': round(np.mean(io_cost), 1), 'median':round(np.median(io_cost), 1),'std':round(np.std(io_cost), 1)})
+            slice_time_cost.append(
+                {'mean': round(round(np.mean(time_cost), 2), 2), 'median': round(np.median(time_cost), 2),
+                 'std': np.std(time_cost)})
+            slice_io_cost.append({'mean': round(np.mean(io_cost), 1), 'median': round(np.median(io_cost), 1),
+                                  'std': round(np.std(io_cost), 1)})
             # CSD
             time_cost = []
             io_cost = []
@@ -1024,8 +1107,11 @@ class CaseStudyExperiments:
                 io_cost.append(st.io_count)
                 restaurant_index.drop_file()
                 residential_district_index.drop_file()
-            csd_time_cost.append({'mean': round(round(np.mean(time_cost), 2), 2), 'median':round(np.median(time_cost), 2),'std':np.std(time_cost)})
-            csd_io_cost.append({'mean': round(np.mean(io_cost), 1), 'median':round(np.median(io_cost), 1),'std':round(np.std(io_cost), 1)})
+            csd_time_cost.append(
+                {'mean': round(round(np.mean(time_cost), 2), 2), 'median': round(np.median(time_cost), 2),
+                 'std': np.std(time_cost)})
+            csd_io_cost.append({'mean': round(np.mean(io_cost), 1), 'median': round(np.median(io_cost), 1),
+                                'std': round(np.std(io_cost), 1)})
         time_v = dict()
         time_v['data'] = {'VR': vr_time_cost, 'SLICE': slice_time_cost, 'CSD': csd_time_cost}
         time_v['x_tick_labels'] = k_list
