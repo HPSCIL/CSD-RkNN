@@ -118,7 +118,7 @@ If you want to evaluate the performance of CSD-R*k*NN against other algorithms (
 >>> plot_single_distribution(time_cost, 'Effect-of-data-size-on-MonoRkNN-time-cost(k=1000,Real)')
 >>> plot_single_distribution(io_cost, 'Effect-of-data-size-on-MonoRkNN-io-cost(k=1000,Real)')
 ```
-<table>
+<table align="center">
   <tr>
     <td align="center"><img src="images/Effect-of-data-size-on-MonoRkNN-time-cost(k=10,Synthetic).png" width="200px"><br>Time (Synthetic,k=10)</td>
     <td align="center"><img src="images/Effect-of-data-size-on-MonoRkNN-time-cost(k=10,Synthetic).png" width="200px"><br>I/O (Synthetic,k=10)</td>
@@ -152,7 +152,7 @@ If you want to evaluate the performance of CSD-R*k*NN against other algorithms (
 >>> plot_single_distribution(time_cost, 'Effect-of-data-size-on-BiRkNN-time-cost(k=1000,Real)')
 >>> plot_single_distribution(io_cost, 'Effect-of-data-size-on-BiRkNN-io-cost(k=1000,Real)')
 ```
-<table>
+<table align="center">
   <tr>
     <td align="center"><img src="images/Effect-of-data-size-on-BiRkNN-time-cost(k=10,Synthetic).png" width="200px"><br><font size="1">Time (Synthetic,k=10)</font></td>
     <td align="center"><img src="images/Effect-of-data-size-on-BiRkNN-time-cost(k=10,Synthetic).png" width="200px"><br>I/O (Synthetic,k=10)</td>
@@ -176,7 +176,7 @@ If you want to evaluate the performance of CSD-R*k*NN against other algorithms (
 >>> plot_single_distribution(time_cost, scale='log')
 >>> plot_single_distribution(io_cost, scale='log')
 ```
-<table border="0px">
+<table  align="center">
   <tr>
     <td align="center" border="0px"><img src="images/Effect-of-k-on-MonoRkNN-time-cost(Synthetic).png" width="200px"><br>Time (Synthetic)</td>
     <td align="center" border="0px"><img src="images/Effect-of-k-on-MonoRkNN-io-cost(Synthetic).png" width="200px"><br>I/O (Synthetic)</td>
@@ -195,7 +195,7 @@ If you want to evaluate the performance of CSD-R*k*NN against other algorithms (
 >>> plot_single_distribution(time_cost, scale='log')
 >>> plot_single_distribution(io_cost, scale='log')
 ```
-<table>
+<table align="center">
   <tr>
     <td align="center"><img src="images/Effect-of-k-on-BiRkNN-time-cost(Synthetic).png" width="200px"><br>Time (Synthetic)</td>
     <td align="center"><img src="images/Effect-of-k-on-BiRkNN-io-cost(Synthetic).png" width="200px"><br>I/O (Synthetic)</td>
@@ -213,7 +213,7 @@ If you want to evaluate the performance of CSD-R*k*NN against other algorithms (
 >>> plot_dual_distribution(time_cost)
 >>> plot_dual_distribution(io_cost)
 ```
-<table>
+<table align="center">
   <tr>
     <td align="center"><img src="images/Effect-of-user-relative-to-facility-on-BiRkNN-time-cost(k=10).png" width="200px"><br>Time (k=10)</td>
     <td align="center"><img src="images/Effect-of-user-relative-to-facility-on-BiRkNN-io-cost(k=10).png" width="200px"><br>I/O (k=10)</td>
@@ -231,7 +231,7 @@ If you want to evaluate the performance of CSD-R*k*NN against other algorithms (
 >>> plot_single_distribution(time_cost)
 >>> plot_single_distribution(io_cost)
 ```
-<table>
+<table align="center">
   <tr>
     <td align="center"><img src="images/Effect-of-distribution-on-BiRkNN-time-cost(k=10).png" width="400px"><br>Time (k=10)</td>
     <td align="center"><img src="images/Effect-of-distribution-on-BiRkNN-io-cost(k=10).png" width="400px"><br>I/O (k=10)</td>  
@@ -261,7 +261,7 @@ If you want to evaluate the performance of CSD-R*k*NN against other algorithms (
 >>> plot_single_distribution(time_cost)
 >>> plot_single_distribution(io_cost)
 ```
-<table>
+<table align="center">
   <tr>
     <td align="center"><img src="images/Time-cost-of-RkNN-for-mall.png" width="200px"><br>Time (Mall)</td>
     <td align="center"><img src="images/IO-cost-of-RkNN-for-mall.png" width="200px"><br>I/O (Mall)</td>
@@ -274,7 +274,7 @@ If you want to evaluate the performance of CSD-R*k*NN against other algorithms (
 >>> plot_single_distribution(time_cost)
 >>> plot_single_distribution(io_cost)
 ```
-<table>
+<table align="center">
   <tr>
     <td align="center"><img src="images/Time-cost-of-RkNN-for-hospital.png" width="200px"><br>Time (Hospital)</td>
     <td align="center"><img src="images/IO-cost-of-RkNN-for-hospital.png" width="200px"><br>I/O (Hospital)</td>
@@ -287,7 +287,7 @@ If you want to evaluate the performance of CSD-R*k*NN against other algorithms (
 >>> plot_single_distribution(time_cost)
 >>> plot_single_distribution(io_cost)
 ```
-<table>
+<table align="center">
   <tr>
     <td align="center"><img src="images/Time-cost-of-RkNN-for-school.png" width="200px"><br>Time (School)</td>
     <td align="center"><img src="images/IO-cost-of-RkNN-for-school.png" width="200px"><br>I/O (School)</td>
