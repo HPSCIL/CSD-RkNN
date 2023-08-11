@@ -8,18 +8,7 @@ font = {
 }
 
 
-# def plot_points(ax, points):
-#     fig, ax = plt.subplots(figsize=(5, 5))
-#     ax.set_xlim(min_x, max_x)
-#     ax.set_ylim(min_y, max_y)
-#     ax.scatter([p.x for p in points], [p.y for p in points], marker='.', c='black', s=2, linewidths=0)
-#     ax.set_xticks([])
-#     ax.set_yticks([])
-#     fig.tight_layout()
-#     plt.show()
-
-
-def plot_dual_distribution(v, name=None, key='mean'):
+def plot_dual_distribution(v, name=None, key='mean',scale='linear'):
     colors = ['white', 'darkgray', 'black']
     markers = ['o', 'v', 'x']
     data = v['data']
@@ -35,6 +24,7 @@ def plot_dual_distribution(v, name=None, key='mean'):
     width = 0.25
     x = np.arange(len(x_tick_labels))
     blank = np.zeros(len(x_tick_labels))
+    ax.set_yscale(scale)
     ax.plot(x, blank, label='Uniform:', color='white', alpha=0)
     ax.plot(x, blank, label=' Normal:', color='white', alpha=0)
     ax.bar(x - width, [e[key] for e in uniform_data['VR']], width, label='VR', color=colors[0], edgecolor='black')
@@ -54,13 +44,12 @@ def plot_dual_distribution(v, name=None, key='mean'):
     ax.set_xticklabels([str(label) for label in x_tick_labels])
     ax.tick_params(labelsize=24)
     fig.tight_layout()
-    if name is None:
-        plt.show()
-    else:
-        plt.savefig(name + '.pdf', format='pdf')
+    if name is not None:
+        print(f'\033[32m{name} is complete\033[39m')
+    plt.show()
 
 
-def plot_single_distribution(v, name=None, key='mean'):
+def plot_single_distribution(v, name=None, key='mean',scale='linear'):
     colors = ['white', 'darkgray', 'black']
     data = v['data']
     x_tick_labels = v['x_tick_labels']
@@ -72,6 +61,7 @@ def plot_single_distribution(v, name=None, key='mean'):
         fig, ax = plt.subplots(figsize=(8, 5))
     width = 0.25
     x = np.arange(len(x_tick_labels))
+    ax.set_yscale(scale)
     ax.bar(x - width, [e[key] for e in data['VR']], width, label='VR', color=colors[0], edgecolor='black')
     ax.bar(x, [e[key] for e in data['SLICE']], width, label='SLICE', color=colors[1], edgecolor='black')
     ax.bar(x + width, [e[key] for e in data['CSD']], width, label='CSD', color=colors[2], edgecolor='black')
@@ -82,7 +72,6 @@ def plot_single_distribution(v, name=None, key='mean'):
     ax.set_xticklabels([str(label) for label in x_tick_labels])
     ax.tick_params(labelsize=24)
     fig.tight_layout()
-    if name is None:
-        plt.show()
-    else:
-        plt.savefig(name + '.pdf', format='pdf')
+    if name is not None:
+        print(f'\033[32m{name} is complete\033[39m')
+    plt.show()
