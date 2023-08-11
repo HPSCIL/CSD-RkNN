@@ -98,6 +98,8 @@ Plot the result:
 ## Evaluation
 If you want to evaluate the performance of CSD-R*k*NN against other algorithms (e.g., SLICE and VR-R*k*NN), you can run the following codes.
 ```python
+>>> import experiments
+>>> from common.fig import plot_dual_distribution, plot_single_distribution
 >>> # effect of data size on Mono-RkNN
 >>> time_cost, io_cost = experiments.BenchmarkExperiments.evaluate_effect_of_data_size_on_MonoRkNN(k=10, 
                                                                                                    distribution='Synthetic')
@@ -133,36 +135,46 @@ If you want to evaluate the performance of CSD-R*k*NN against other algorithms (
 
 ```python
 >>> # effect of data size on Bi-RkNN
->>> time_cost, io_cost = experiments.BenchmarkExperiments.evaluate_effect_of_data_size_on_BiRkNN(10)
->>> plot_dual_distribution(time_cost)
->>> plot_dual_distribution(io_cost)
->>> time_cost, io_cost = experiments.BenchmarkExperiments.evaluate_effect_of_data_size_on_BiRkNN(1000)
->>> plot_dual_distribution(time_cost)
->>> plot_dual_distribution(io_cost)
+>>> time_cost, io_cost = experiments.BenchmarkExperiments.evaluate_effect_of_data_size_on_BiRkNN(k=10, 
+                                                                                                   distribution='Synthetic')
+>>> plot_dual_distribution(time_cost, 'Effect-of-data-size-on-BiRkNN-time-cost(k=10,Synthetic)')
+>>> plot_dual_distribution(io_cost, 'Effect-of-data-size-on-BiRkNN-io-cost(k=10,Synthetic)')
+>>> time_cost, io_cost = experiments.BenchmarkExperiments.evaluate_effect_of_data_size_on_BiRkNN(k=10,
+                                                                                                   distribution='Real')
+>>> plot_single_distribution(time_cost, 'Effect-of-data-size-on-BiRkNN-time-cost(k=10,Real)')
+>>> plot_single_distribution(io_cost, 'Effect-of-data-size-on-BiRkNN-io-cost(k=10,Real)')
+>>> time_cost, io_cost = experiments.BenchmarkExperiments.evaluate_effect_of_data_size_on_BiRkNN(k=1000,
+                                                                                                   distribution='Synthetic')
+>>> plot_dual_distribution(time_cost, 'Effect-of-data-size-on-BiRkNN-time-cost(k=1000,Synthetic)')
+>>> plot_dual_distribution(io_cost, 'Effect-of-data-size-on-BiRkNN-io-cost(k=1000,Synthetic)')
+>>> time_cost, io_cost = experiments.BenchmarkExperiments.evaluate_effect_of_data_size_on_BiRkNN(k=1000,
+                                                                                                   distribution='Real')
+>>> plot_single_distribution(time_cost, 'Effect-of-data-size-on-BiRkNN-time-cost(k=1000,Real)')
+>>> plot_single_distribution(io_cost, 'Effect-of-data-size-on-BiRkNN-io-cost(k=1000,Real)')
 ```
 <table>
   <tr>
-    <td align="center"><img src="images/Effect-of-data-size-on-BiRkNN-time-cost(k=10,Synthetic).png" width="200px"><br>Time (Synthetic,k=10)</td>
+    <td align="center"><img src="images/Effect-of-data-size-on-BiRkNN-time-cost(k=10,Synthetic).png" width="200px"><br><font size="1">Time (Synthetic,k=10)</font></td>
     <td align="center"><img src="images/Effect-of-data-size-on-BiRkNN-time-cost(k=10,Synthetic).png" width="200px"><br>I/O (Synthetic,k=10)</td>
     <td align="center"><img src="images/Effect-of-data-size-on-BiRkNN-time-cost(k=1000,Synthetic).png" width="200px"><br>Time (Synthetic,k=1000)</td>
     <td align="center"><img src="images/Effect-of-data-size-on-BiRkNN-io-cost(k=1000,Synthetic).png" width="200px"><br>I/O (Synthetic,k=1000)</td>  
   </tr>
   <tr>
-    <td align="center"><img src="images/Effect-of-data-size-on-BiRkNN-time-cost(k=10,Real).png" width="200px"><br>Time (Real,k=10)</td>
-    <td align="center"><img src="images/Effect-of-data-size-on-BiRkNN-io-cost(k=10,Real).png" width="200px"><br>I/O (Real,k=10)</td>
-    <td align="center"><img src="images/Effect-of-data-size-on-BiRkNN-time-cost(k=1000,Real).png" width="200px"><br>Time (Real,k=1000)</td>
-    <td align="center"><img src="images/Effect-of-data-size-on-BiRkNN-io-cost(k=1000,Real).png" width="200px"><br>I/O (Real,k=1000)</td>  
+    <td align="center"><img src="images/Effect-of-data-size-on-BiRkNN-time-cost(k=10,Real).png" width="200px"><br>Time (Real, k=10)</td>
+    <td align="center"><img src="images/Effect-of-data-size-on-BiRkNN-io-cost(k=10,Real).png" width="200px"><br>I/O (Real, k=10)</td>
+    <td align="center"><img src="images/Effect-of-data-size-on-BiRkNN-time-cost(k=1000,Real).png" width="200px"><br>Time (Real, k=1000)</td>
+    <td align="center"><img src="images/Effect-of-data-size-on-BiRkNN-io-cost(k=1000,Real).png" width="200px"><br>I/O (Real, k=1000)</td>  
   </tr>
 </table>
 
 ```python
 >>> # effect of k on Mono-RkNN
 >>> time_cost, io_cost = experiments.BenchmarkExperiments.evaluate_effect_of_k_on_MonoRkNN('Synthetic')
->>> plot_dual_distribution(time_cost)
->>> plot_dual_distribution(io_cost)
+>>> plot_dual_distribution(time_cost, scale='log')
+>>> plot_dual_distribution(io_cost, scale='log')
 >>> time_cost, io_cost = experiments.BenchmarkExperiments.evaluate_effect_of_k_on_MonoRkNN('Real')
->>> plot_single_distribution(time_cost)
->>> plot_single_distribution(io_cost)
+>>> plot_single_distribution(time_cost, scale='log')
+>>> plot_single_distribution(io_cost, scale='log')
 ```
 <table border="0px">
   <tr>
@@ -177,11 +189,11 @@ If you want to evaluate the performance of CSD-R*k*NN against other algorithms (
 ```python
 >>> # effect of k on Bi-RkNN
 >>> time_cost, io_cost = experiments.BenchmarkExperiments.evaluate_effect_of_k_on_BiRkNN('Synthetic')
->>> plot_dual_distribution(time_cost)
->>> plot_dual_distribution(io_cost)
+>>> plot_dual_distribution(time_cost, scale='log')
+>>> plot_dual_distribution(io_cost, scale='log')
 >>> time_cost, io_cost = experiments.BenchmarkExperiments.evaluate_effect_of_k_on_BiRkNN('Real')
->>> plot_single_distribution(time_cost)
->>> plot_single_distribution(io_cost)
+>>> plot_single_distribution(time_cost, scale='log')
+>>> plot_single_distribution(io_cost, scale='log')
 ```
 <table>
   <tr>
@@ -238,8 +250,8 @@ If you want to evaluate the performance of CSD-R*k*NN against other algorithms (
 ```
 <table align="center">
   <tr>
-    <td align="center"><img src="images/Time-cost-of-RkNN-for-restaurant.png" width="200px"><br>Time cost (Restaurant)</td>
-    <td align="center"><img src="images/IO-cost-of-RkNN-for-restaurant.png" width="200px"><br>Number of I/Os (Restaurant)</td>
+    <td align="center"><img src="images/Time-cost-of-RkNN-for-restaurant.png" width="200px"><br>Time (Restaurant)</td>
+    <td align="center"><img src="images/IO-cost-of-RkNN-for-restaurant.png" width="200px"><br>I/O (Restaurant)</td>
   </tr>
 </table>
 
@@ -251,8 +263,8 @@ If you want to evaluate the performance of CSD-R*k*NN against other algorithms (
 ```
 <table>
   <tr>
-    <td align="center"><img src="images/Time-cost-of-RkNN-for-mall.png" width="200px"><br>Time cost (Mall)</td>
-    <td align="center"><img src="images/IO-cost-of-RkNN-for-mall.png" width="200px"><br>Number of I/Os (Mall)</td>
+    <td align="center"><img src="images/Time-cost-of-RkNN-for-mall.png" width="200px"><br>Time (Mall)</td>
+    <td align="center"><img src="images/IO-cost-of-RkNN-for-mall.png" width="200px"><br>I/O (Mall)</td>
   </tr>
 </table>
 
@@ -264,8 +276,8 @@ If you want to evaluate the performance of CSD-R*k*NN against other algorithms (
 ```
 <table>
   <tr>
-    <td align="center"><img src="images/Time-cost-of-RkNN-for-hospital.png" width="200px"><br>Time cost (Hospital)</td>
-    <td align="center"><img src="images/IO-cost-of-RkNN-for-hospital.png" width="200px"><br>Number of I/Os (Hospital)</td>
+    <td align="center"><img src="images/Time-cost-of-RkNN-for-hospital.png" width="200px"><br>Time (Hospital)</td>
+    <td align="center"><img src="images/IO-cost-of-RkNN-for-hospital.png" width="200px"><br>I/O (Hospital)</td>
   </tr>
 </table>
 
@@ -277,8 +289,8 @@ If you want to evaluate the performance of CSD-R*k*NN against other algorithms (
 ```
 <table>
   <tr>
-    <td align="center"><img src="images/Time-cost-of-RkNN-for-school.png" width="200px"><br>Time cost (School)</td>
-    <td align="center"><img src="images/IO-cost-of-RkNN-for-school.png" width="200px"><br>Number of I/Os (School)</td>
+    <td align="center"><img src="images/Time-cost-of-RkNN-for-school.png" width="200px"><br>Time (School)</td>
+    <td align="center"><img src="images/IO-cost-of-RkNN-for-school.png" width="200px"><br>I/O (School)</td>
   </tr>
 </table>
 
